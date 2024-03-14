@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/Css/base.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}
+
+      {% endblock %}
+    </title>
+    {% block Css %}
+
+    {% endblock %}
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-white sticky-top navbar-light p-3 shadow-sm">
+      <div class="container">
+        <a class="navbar-brand" href="/"><i class="fa-solid fa-shop me-2"></i> <strong>iCourses</strong></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="mx-auto my-3 d-lg-none d-sm-block d-xs-block">
+          <div class="input-group">
+            <span class="border-warning input-group-text bg-warning text-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" class="form-control border-warning" style="color:#7a7a7a" />
+            <button class="btn btn-warning text-white">Search</button>
+          </div>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <div class="ms-auto d-none d-lg-block">
+            <div class="input-group">
+              <span class="border-warning input-group-text bg-warning text-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+              <input type="text" class="form-control border-warning" style="color:#7a7a7a" />
+              <button class="btn btn-warning text-white">Search</button>
+            </div>
+          </div>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link mx-2 text-uppercase active" aria-current="page" href="#">Offers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link mx-2 text-uppercase" href="#">Products</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link mx-2 text-uppercase" href="#">Catalog</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link mx-2 text-uppercase" href="#">Services</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link mx-2 text-uppercase" href="#">About</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav ms-auto">
+            {% if user.is_authenticated %}
+            <li class="nav-item dropdown mt-2">
+              <a class="text-primary nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <img width="30px" src="{{ user.picture.url }}" alt="" onerror="src='https://static-00.iconduck.com/assets.00/profile-circle-icon-2048x2048-cqe5466q.png' " />
+                Welcome <b>{{user.first_name}}</b>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item text-dark fs-6" href="/profilePage">Profile</a></li>
+                <li><a class="dropdown-item text-danger fs-6" href="/logout">Logout</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li class="dropdown-item text-secondary">Welcome To iCourses <br><b>{{request.user}}</b></li>
+              </ul>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link btn btn-info mx-2 text-uppercase" href="/login/"><i class="fa-solid fa-cart-shopping me-1"></i> Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link mx-2 btn btn-info text-uppercase" href="/signup/"><i class="fa-solid fa-circle-user me-1"></i> SignUp</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    {% block body %}
+
+    {% endblock %}
+
+    <footer class="text-center text-lg-start mt-5 text-dark" style="background-color: #ECEFF1">
+      <section class="d-flex justify-content-between p-2 text-white" style="background-color: #21D192">
+      </section>
+      <section class="">
+        <div class="container text-center text-md-start mt-5">
+          <!-- Grid row -->
+          <div class="row mt-3">
+            <!-- Grid column -->
+            <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+              <!-- Content -->
+              <h6 class="fw-bold">Welcome To iCourses</h6>
+              <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #7c4dff; height: 2px" />
+              <p>Unlock your full learning potential with our intuitive Tech & NonTech Courses. Buy your first course in 20% - 50% discount.</p>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+              <!-- Links -->
+              <h6 class="text-uppercase fw-bold">Products</h6>
+              <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #7c4dff; height: 2px" />
+              <p>
+                <a href="#!" class="text-dark">Product 1</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">Product 2</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">Product 3</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">Product 4</a>
+              </p>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+              <!-- Links -->
+              <h6 class="text-uppercase fw-bold">Useful links</h6>
+              <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #7c4dff; height: 2px" />
+              <p>
+                <a href="#!" class="text-dark">Your Account</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">Become an Affiliate</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">Shipping Rates</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">Help</a>
+              </p>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+              <!-- Links -->
+              <h6 class="text-uppercase fw-bold">Contact</h6>
+              <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #7c4dff; height: 2px" />
+              <p>
+                <i class="fas fa-home mr-3"></i> New York, NY 10012, US
+              </p>
+              <p>
+                <i class="fas fa-envelope mr-3"></i> info@example.com
+              </p>
+              <p>
+                <i class="fas fa-phone mr-3"></i> + 01 234 567 88
+              </p>
+              <p>
+                <i class="fas fa-print mr-3"></i> + 01 234 567 89
+              </p>
+            </div>
+            <!-- Grid column -->
+          </div>
+          <!-- Grid row -->
+        </div>
+      </section>
+      <div class="text-center p-2" style="background-color: rgba(0, 0, 0, 0.2)">
+        © 2024 Copyright:
+        <a class="text-dark" href="">Mohit Pandey</a>
+      </div>
+      <!-- Copyright -->
+    </footer>
+
+    {% block script %}
+
+    {% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Welcome to iCourses{% endblock %}
+
+{% block Css %}
+<link rel="stylesheet" href="/static/Css/home.css">
+{% endblock %}
+
+{% block body %}
+    
+<section class="container page mt-5 mb-4">
+    <div class="content__container mt-5">
+      <h1>
+        Best Courses<br />
+        <span class="heading__1">Learning Platform</span><br />
+        <span class="heading__2">in The World</span>
+      </h1>
+      <p>
+        Unlock your full learning potential with our intuitive Tech & NonTech Courses
+        platform. Seamlessly blending technology and education, we provide an
+        immersive learning environment that combines interactive lessons,
+        amazing Concepts, and intelligent feedback.
+      </p>
+    <form>
+        <input type="text" placeholder="What do you want to learn" />
+        <a href="/login/"><button type="submit">Search</button></a>
+      </form>
+    </div>
+    <div class="image__container">
+      <img src="static/Images/header-1.jpg" alt="header" />
+      <img src="static/Images/header-2.jpg" alt="header" />
+      <div class="image__content">
+        <ul>
+          <li>Get 30% off on first purchase in a month</li>
+          <li>Amazing Courses</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+{% endblock %}

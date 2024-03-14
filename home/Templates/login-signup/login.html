@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}
+  Login - iCourses
+{% endblock %}
+{% block Css %}
+{% endblock %}
+{% block body %}
+  <!-- Section: Design Block -->
+  <section class="">
+    <!-- Jumbotron -->
+    <div class="px-4 py-5 px-md-5 text-center text-lg-start" style="background-color: hsl(0, 0%, 96%)">
+      <div class="container">
+        <div class="row gx-lg-5 align-items-center">
+          <div class="col-lg-6 mb-5 mb-lg-0">
+            <h1 class="my-5 display-3 fw-bold ls-tight">
+              The best Platform <br />
+              <span class="text-primary">for grow yourself</span>
+            </h1>
+            <p style="color: hsl(217, 10%, 50.8%)">Unlock your potential with iCourses. Learn, grow, and succeed with our comprehensive online learning platform. Your journey to knowledge starts here."</p>
+          </div>
+
+          <div class="col-lg-6 mb-5 mb-lg-0">
+            <div class="card">
+              <div class="card-body py-5 px-md-5">
+                <form method="post">
+                  {% csrf_token %}
+                  <div class="row">
+                    <!-- Email / Username input -->
+                    <div class="form-outline mb-4">
+                      <input type="text" id="username" name="username" class="form-control" required/>
+                      <label class="form-label" for="username">Username</label>
+                    </div>
+                    <!-- Password input -->
+                    <div class="form-outline mb-4">
+                      <input type="password" id="pass" name="password" class="form-control" required />
+                      <label class="form-label" for="pass">Password</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block mb-4">Log in</button>
+                  <p>Don't have an account <a href="/signup"> SignUp</a></p>
+                  </div>
+                  {% if messages %}
+                  {{ message.tags }}
+                      {% for message in messages %}
+                      <h5 style="color:red">{{ message }}</h5> 
+                      {% endfor %}
+                    {% endif %}
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Jumbotron -->
+  </section>
+  <!-- Section: Design Block -->
+{% endblock %}
