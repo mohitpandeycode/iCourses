@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}
+  Your Profile-iCourses
+{% endblock %}
+{% block Css %}
+  <link rel="stylesheet" href="/static/Css/updateProfile.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+{% endblock %}
+{% block body %}
+  <div class="container-xl px-4 mt-4">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+    <div class="row">
+        <div class="col-xl-4">
+          <!-- Profile picture card -->
+          <div class="card mb-4 mb-xl-0">
+            <div class="card-header">Profile Picture</div>
+            <div class="card-body text-center">
+              <!-- Profile picture image -->
+
+              {% if userinfo and userinfo.picture %}
+              <img class="img-account-profile rounded-center mb-2"  src="{{ userinfo.picture.url }}" style="width: 150px;" alt="User Picture" />
+            {% else %}
+            <img width="150px" src="https://static-00.iconduck.com/assets.00/profile-circle-icon-2048x2048-cqe5466q.png" alt="">
+              {% endif %}
+
+              <!-- Profile picture help block -->
+              <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
+              <!-- Profile picture upload button -->
+              <input type="file" id="uploadInput" name="picture" style="display: none;" />
+              <button class="btn btn-primary" type="button" onclick="document.getElementById('uploadInput').click();">Upload new image</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-8">
+          <!-- Account details card -->
+          <div class="card mb-4">
+            <div class="card-header">Account Details</div>
+            <div class="card-body">
+              <!-- Form Group (username) -->
+              <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                  <label class="small mb-1" for="inputUsername">Username (Always Remember Your Username)</label>
+                  <input class="form-control" id="inputUsername" type="text" name="username" placeholder="Enter your username" value="{{user.username}}" />
+                </div>
+                <div class="col-md-6">
+                  <label class="small mb-1" for="inputUsername">Email</label>
+                  <input class="form-control" id="inputUsername" name="email" type="email" placeholder="Enter your email" value="{{user.email}}" />
+                </div>
+              </div>
+              <!-- Form Row -->
+              <div class="row gx-3 mb-3">
+                <!-- Form Group (first name) -->
+                <div class="col-md-6">
+                  <label class="small mb-1" for="inputFirstName">First name</label>
+                  <input class="form-control" id="inputFirstName" name="fname" type="text" placeholder="Enter your first name" value="{{user.first_name}}" />
+                </div>
+                <!-- Form Group (last name) -->
+                <div class="col-md-6">
+                  <label class="small mb-1" for="inputLastName">Last name</label>
+                  <input class="form-control" id="inputLastName" name="lname" type="text" placeholder="Enter your last name" value="{{user.last_name}}" />
+                </div>
+              </div>
+              <!-- Form Row -->
+              <div class="row gx-3 mb-3">
+                <!-- Form Group (organization name) -->
+                <div class="col-md-6">
+                  <label class="small mb-1" for="inputOrgName">Contact Number</label>
+                  <input class="form-control" id="inputOrgName" name="phone" type="tel" placeholder="Enter Contact no." value="{{userinfo.phone}}" />
+                </div>
+                <!-- Form Group (location) -->
+                <div class="col-md-6">
+                  <label class="small mb-1" for="inputLocation">Address</label>
+                  <input class="form-control" id="inputLocation" name="address" type="text" placeholder="Enter your location" value="{{userinfo.address}}" />
+                </div>
+              </div>
+                <!-- Form Group (birthday) -->
+                <div class="col-md-6">
+                  <label class="small mb-1" for="inputBirthday">Date of Birth</label>
+                  <input class="form-control" id="inputBirthday" type="text" name="birthdate" placeholder="Enter your DOB" value="{{userinfo.birthdate}}" />
+                </div>
+              </div>
+              <!-- Save changes button -->
+              <button class="btn btn-primary" type="submit">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}

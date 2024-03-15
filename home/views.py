@@ -2,9 +2,12 @@ from django.shortcuts import render,redirect,HttpResponse
 from django.contrib.auth.models import User  # use this for Creating User
 from django.contrib.auth import authenticate, login, logout  # use this for login and logout the user 
 from django.contrib import messages   #use this for Get message when signin,login go to singnup function..
-from .models import UserProfile
+from .models import UserProfile,Course,Category
+from django.db.models import Count
 import random
-import string
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+
 
 
 # Create your views here.
@@ -12,8 +15,74 @@ def Home (request):
     return render(request, 'Home/home.html')
 
 def ProfilePage(request):
-    return render(request,'UserProfile/userprofile.html')
+    userinfo = get_object_or_404(UserProfile, user=request.user)
+    return render(request,'UserProfile/userprofile.html',{'userinfo':userinfo})
 
+def updateProfile(request):
+    userinfo = get_object_or_404(UserProfile, user=request.user)
+    if request.method == "POST":
+        picture = request.FILES.get("picture")
+        username = request.POST.get("username")
+        first_name = request.POST.get("fname")
+        last_name = request.POST.get("lname")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone")
+        address = request.POST.get("address")
+        birthdate = request.POST.get("birthdate")
+
+        # Update the related User instance
+        user = request.user
+        user.username = username
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.save()
+
+        # Update the UserProfile instance
+        userinfo.phone = phone
+        userinfo.address = address
+        userinfo.birthdate = birthdate
+        if picture:
+            userinfo.picture = picture
+        userinfo.save()
+        messages.success(request, "Profile Updated Successfully!")
+        return redirect("/profilePage/")
+    return render(request, 'UserProfile/updateProfile.html', {'userinfo': userinfo})
+
+def Products(request):
+    courses = Course.objects.order_by('-studentOnCourse')[:6]
+    category_counts = Category.objects.annotate(course_count=Count('course'))  
+    context = {'courses':courses, 'categories':category_counts}
+    return render(request, 'Products/productPage.html',context)
+
+def AllCourses(request):
+    if request.method == "GET":
+      search = request.GET.get('search')
+      if search != None:
+        course = Course.objects.filter(courseName__icontains=search)
+        return render(request,"Products/allCourse.html",{'courses':course})
+    courses = Course.objects.order_by('-studentOnCourse')
+    context = {'courses':courses}
+    return render(request,"Products/allCourse.html",context)
+
+def ProductView(request,id):
+    view =Course.objects.get(id=id)
+    return render(request,'Products/productView.html',{'view':view})
+
+@login_required
+def CategoryCourses(request,id):
+    try:
+        category = Category.objects.get(id=id)
+        courses = Course.objects.filter(courseCategory=category)
+        context = {'courses': courses, 'category': category}
+        return render(request, 'Products/categoryView.html', context)
+    except Category.DoesNotExist:
+        context = {'error_message': 'Category Courses not found.'}
+        return render(request, 'Products/categoryView.html', context)
+
+
+def About(request):
+    return render(request,'About/about.html')
 
 def UserSignup(request):
     if request.method == "POST":
@@ -50,7 +119,7 @@ def UserSignup(request):
 
         # Generate random referral code for every user
         random_numbers = ''.join(random.choices('0123456789', k=3))
-        referral_code = f"{user.first_name}@{user.email[3:10:2]}{random_numbers}"
+        referral_code = f"{user.first_name}@{user.email[2:10:2]}{random_numbers}"
         
         # Assign random referral code to UserProfile of user
         user_profile, created = UserProfile.objects.get_or_create(user=user)

@@ -1,16 +1,24 @@
 a {
-    font-size:14px;
-    font-weight:700
+  font-size: 14px;
+  font-weight: 700
+}
+
+.superNav {
+  font-size: 13px;
+}
+
+.form-control {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.rounded-image {
+  border-radius: 50%;
+}
+
+
+@media screen and (max-width:540px) {
+  .centerOnMobile {
+    text-align: center
   }
-  .superNav {
-    font-size:13px;
-  }
-  .form-control {
-    outline:none !important;
-    box-shadow: none !important;
-  }
-  @media screen and (max-width:540px){
-    .centerOnMobile {
-      text-align:center
-    }
-  }
+}

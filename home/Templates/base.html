@@ -15,10 +15,11 @@
 
     {% endblock %}
   </head>
+
   <body>
     <nav class="navbar navbar-expand-lg bg-white sticky-top navbar-light p-3 shadow-sm">
       <div class="container">
-        <a class="navbar-brand" href="/"><i class="fa-solid fa-shop me-2"></i> <strong>iCourses</strong></a>
+        <a class="navbar-brand fs-2" href="/"><strong>iCourses</strong></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
         <div class="mx-auto my-3 d-lg-none d-sm-block d-xs-block">
           <div class="input-group">
@@ -29,50 +30,59 @@
         </div>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
           <div class="ms-auto d-none d-lg-block">
+            <form method="get">
             <div class="input-group">
               <span class="border-warning input-group-text bg-warning text-white"><i class="fa-solid fa-magnifying-glass"></i></span>
-              <input type="text" class="form-control border-warning" style="color:#7a7a7a" />
+              <input type="search" class="form-control border-warning" name="search" placeholder="Search Courses" style="color:#7a7a7a" />
               <button class="btn btn-warning text-white">Search</button>
             </div>
+           </form>
           </div>
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link mx-2 text-uppercase active" aria-current="page" href="#">Offers</a>
+              <a class="nav-link mx-2 text-uppercase {% if request.path == '/product/' %}active{% endif %}" href="/product/">Products</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link mx-2 text-uppercase" href="#">Products</a>
+              <a class="nav-link mx-2 text-uppercase {% if request.path == '/eventsRegistration/' %}active{% endif %}" href="/eventsRegistration/">Events</a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link mx-2 text-uppercase" href="#">Catalog</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link mx-2 text-uppercase" href="#">Services</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link mx-2 text-uppercase" href="#">About</a>
+              <a class="nav-link mx-2 text-uppercase {% if request.path == '/about/' %}active{% endif %}" href="/about/">About</a>
             </li>
           </ul>
           <ul class="navbar-nav ms-auto">
             {% if user.is_authenticated %}
-            <li class="nav-item dropdown mt-2">
-              <a class="text-primary nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <img width="30px" src="{{ user.picture.url }}" alt="" onerror="src='https://static-00.iconduck.com/assets.00/profile-circle-icon-2048x2048-cqe5466q.png' " />
-                Welcome <b>{{user.first_name}}</b>
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item text-dark fs-6" href="/profilePage">Profile</a></li>
-                <li><a class="dropdown-item text-danger fs-6" href="/logout">Logout</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li class="dropdown-item text-secondary">Welcome To iCourses <br><b>{{request.user}}</b></li>
-              </ul>
-            </li>
+              <li class="nav-item dropdown mt-2">
+                <a class="text-primary nav-link dropdown-toggle" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  {% if user_info and user_info.picture %}
+                    <img class="rounded-image" width="30px" src="{{ user_info.picture.url }}" alt="User Picture" />
+                  {% else %}
+                  <img width="30px" src="https://static-00.iconduck.com/assets.00/profile-circle-icon-2048x2048-cqe5466q.png" alt="">
+                    {% endif %}
+                  Welcome <b>{{ user.first_name }}</b>
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item text-dark fs-6" href="/profilePage">Profile</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item text-danger fs-6" href="/logout">Logout</a>
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li class="dropdown-item text-secondary">
+                    Welcome To iCourses <br /><b>{{ request.user }}</b>
+                  </li>
+                </ul>
+              </li>
             {% else %}
-            <li class="nav-item">
-              <a class="nav-link btn btn-info mx-2 text-uppercase" href="/login/"><i class="fa-solid fa-cart-shopping me-1"></i> Login</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link mx-2 btn btn-info text-uppercase" href="/signup/"><i class="fa-solid fa-circle-user me-1"></i> SignUp</a>
-            </li>
+              <li class="nav-item">
+                <a class="nav-link btn btn-info mx-2 text-uppercase" href="/login/"><i class="fa-solid fa-cart-shopping me-1"></i> Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link mx-2 btn btn-info text-uppercase" href="/signup/"><i class="fa-solid fa-circle-user me-1"></i> SignUp</a>
+              </li>
             {% endif %}
           </ul>
         </div>
@@ -84,8 +94,7 @@
     {% endblock %}
 
     <footer class="text-center text-lg-start mt-5 text-dark" style="background-color: #ECEFF1">
-      <section class="d-flex justify-content-between p-2 text-white" style="background-color: #21D192">
-      </section>
+      <section class="d-flex justify-content-between p-2 text-white" style="background-color: #21D192"></section>
       <section class="">
         <div class="container text-center text-md-start mt-5">
           <!-- Grid row -->
@@ -172,6 +181,9 @@
     {% block script %}
 
     {% endblock %}
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
