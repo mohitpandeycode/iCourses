@@ -46,3 +46,4 @@ class OrdersPayment(models.Model):
     amount = models.CharField(max_length = 100)
     payment_id = models.CharField(max_length = 150)
     paid = models.BooleanField(default = False)
+

@@ -12,8 +12,9 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 
 
-
 # Create your views here.
+
+# Home page view***********************************************************
 def Home (request):
     if request.method == "GET":
       search = request.GET.get('search')
@@ -22,6 +23,7 @@ def Home (request):
         return render(request,"Products/allCourse.html",{'courses':course})
     return render(request, 'Home/home.html')
 
+# Profile page view********************************************************
 def ProfilePage(request):
     if request.method == "GET":
       search = request.GET.get('search')
@@ -38,7 +40,7 @@ def ProfilePage(request):
     courses = Course.objects.filter(courseName__in=course)
     return render(request, 'UserProfile/userprofile.html', {'userinfo': userinfo, 'courses': courses})
 
-
+# Update ProfilePage view**************************************************
 def updateProfile(request):
     userinfo = get_object_or_404(UserProfile, user=request.user)
     if request.method == "POST":
@@ -70,6 +72,7 @@ def updateProfile(request):
         return redirect("/profilePage/")
     return render(request, 'UserProfile/updateProfile.html', {'userinfo': userinfo})
 
+# Product page view for courses and catagories of courses******************
 def Products(request):
     if request.method == "GET":
       search = request.GET.get('search')
@@ -81,6 +84,7 @@ def Products(request):
     context = {'courses':courses, 'categories':category_counts}
     return render(request, 'Products/productPage.html',context)
 
+# All Courses page view****************************************************
 def AllCourses(request):
     if request.method == "GET":
       search = request.GET.get('search')
@@ -91,6 +95,7 @@ def AllCourses(request):
     context = {'courses':courses}
     return render(request,"Products/allCourse.html",context)
 
+# View for specefic products About******************************************
 def ProductView(request,id):
     if request.method == "GET":
       search = request.GET.get('search')
@@ -100,6 +105,7 @@ def ProductView(request,id):
     view =Course.objects.get(id=id)
     return render(request,'Products/productView.html',{'view':view})
 
+# view for All products of diffrent categories******************************
 def CategoryCourses(request,id):
     try:
         category = Category.objects.get(id=id)
@@ -110,7 +116,11 @@ def CategoryCourses(request,id):
         context = {'error_message': 'Category Courses not found.'}
         return render(request, 'Products/categoryView.html', context)
 
+# Events Page view**********************************************************
+def EventPage(request):
+   return render(request,'EventsPage/eventPage.html')
 
+# About Page view***********************************************************
 def About(request):
     if request.method == "GET":
       search = request.GET.get('search')
@@ -119,6 +129,7 @@ def About(request):
         return render(request,"Products/allCourse.html",{'courses':course})
     return render(request,'About/about.html')
 
+# Payment Intigration payement page*****************************************
 @login_required
 def PaymentPage(request, id):
     course = Course.objects.get(id = id)
@@ -150,10 +161,16 @@ def PaymentPage(request, id):
         })
         Orderspayment = OrdersPayment(user=user,name=name, email=email, buycourse=courseName, amount=amount, payment_id=payment['id'])
         Orderspayment.save()
+        course = Course.objects.get(courseName=courseName)
+                
+                # Increment the studentOnCourse field by 1
+        course.studentOnCourse += 1
+        course.save()
 
         return render(request,'Payment/checkPayment.html',{'payment':payment,'course':course,'discount':display_amount})
     return render(request,'Payment/paymentPage.html',{'course':course})
 
+# Payment Success Page view*************************************************
 @csrf_exempt
 def PaymentSuccess(request):
     if request.method == "POST":
@@ -168,7 +185,7 @@ def PaymentSuccess(request):
 
     return render(request, 'Payment/success.html')
 
-
+# User Signup view**********************************************************
 def UserSignup(request):
     if request.method == "POST":
         first_name = request.POST.get('fname')
@@ -216,7 +233,7 @@ def UserSignup(request):
 
     return render(request, "login-signup/signup.html")
 
-
+# User Login view***********************************************************
 def UserLogin(request):
     if request.method == "POST":
         username = request.POST.get('username')
@@ -239,6 +256,7 @@ def UserLogin(request):
 
     return render(request, "login-signup/login.html")
 
+# User Logout View**********************************************************
 def UserLogout(request):
     if request.user.is_authenticated:
         logout(request)
