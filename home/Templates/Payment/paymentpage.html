@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}
+  Purchased details - iCourses
+{% endblock %}
+{% block Css %}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block body %}
+  <!-- Section: Design Block -->
+  <section class="">
+    <!-- Jumbotron -->
+    <div class="px-4 py-5 px-md-5 text-center text-lg-start" style="background-color: hsl(0, 0%, 96%)">
+      <div class="container">
+        <div class="row gx-lg-5 align-items-center">
+          <div class="col-lg-6 mb-5 mb-lg-0">
+            <h1 class="my-5 display-3 fw-bold ls-tight">
+              Check Out Your<br />
+              <span class="text-primary">Course purchase confirmation !</span>
+            </h1>
+          </div>
+
+          <div class=" col-lg-6 mb-5 mb-lg-0">
+            <div class="card">
+              <div class="info card-body py-5 px-md-5">
+                <form method="post">
+                  {% csrf_token %}
+                  <div class="row">
+                    {% comment %} {% if use.is_authenticated %}{% endif %} {% endcomment %}
+                    <div class="form-outline mb-2">
+                      <input type="text" id="username" name="name" value="{{ user.first_name }} {{ user.last_name }}" class="form-control" readonly />
+                      <label class="form-label" for="username">Name</label>
+                    </div>
+
+                    <div class="form-outline mb-2">
+                      <input type="email" id="pass" value="{{ user.email }}" name="email" class="form-control" readonly />
+                      <label class="form-label" for="pass">Email</label>
+                    </div>
+
+                    <div class="form-outline mb-2">
+                      <input type="text" id="pass" name="course" value="{{ course.courseName }}" class="form-control" readonly />
+                      <label class="form-label" for="pass">Course</label>
+                    </div>
+
+                    <div class="form-outline mb-2">
+                      <input type="text" id="pass" name="amount" value="{{ course.coursePrice }}" class="form-control" readonly />
+                      <label class="form-label" for="pass">₹ Amount</label>
+                    </div>
+                    <div class="form-outline mb-2">
+                    <input placeholder="Referral Code" name="referral" type="text" class="border border-dark btn btn-light" />
+                    </div>
+                    <div>
+                      <button type="submit" id="pay" class="btn btn-primary btn-block mb-4">Proceed To Next Step <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    {% if messages %}
+                      {{ message.tags }}
+                      {% for message in messages %}
+                        <h5 style="color:red">{{ message }}</h5>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+{% endblock %}
+
+
+

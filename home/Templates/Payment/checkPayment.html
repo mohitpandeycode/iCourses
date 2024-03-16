@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}
+Paymenet Succeed - iCourses
+{% endblock %}
+{% block Css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+<style type="text/css">
+    body {
+        background: #f2f2f2;
+    }
+
+    .payment {
+        border: 1px solid #f2f2f2;
+        height: 600px;
+        border-radius: 20px;
+        background: #fff;
+    }
+
+    .payment_header {
+        background: rgb(0, 94, 255);
+        padding: 20px;
+        border-radius: 20px 20px 0px 0px;
+
+    }
+
+    .check {
+        margin: 0px auto;
+        width: 50px;
+        height: 50px;
+        border-radius: 100%;
+        background: #fff;
+        text-align: center;
+    }
+
+    .check i {
+        vertical-align: middle;
+        line-height: 50px;
+        font-size: 30px;
+    }
+
+    .content {
+        text-align: center;
+    }
+
+    .content h1 {
+        font-size: 25px;
+        padding-top: 25px;
+    }
+
+    .content a {
+        width: 200px;
+        height: 35px;
+        color: #fff;
+        border-radius: 30px;
+        padding: 5px 10px;
+        background: rgb(0, 0, 0);
+        transition: all ease-in-out 0.3s;
+    }
+
+    .content a:hover {
+        text-decoration: none;
+        background: #000;
+    }
+
+    #payments input {
+        background-color: #0d6efd;
+        border: none;
+        padding: 13px;
+        border-radius: 14px;
+        color: white;
+        font-size: 22px;
+    }
+    .row{
+        padding: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mx-auto mt-5">
+            <div class="payment">
+                <div class="payment_header">
+                    <div class="check"><i class="fas fa-exclamation-triangle fa-lg text-warning" aria-hidden="true"></i></div>
+                </div>
+                <div class="content">
+                    <h1 class="text-danger">Check Final Payment !</h1>
+                    <p class="text-success fs-5" >Pay with RazorPay The fast & Secure Payment App</p>
+                </div>
+                    <div class="row">
+                        {% comment %} {% if use.is_authenticated %}{% endif %} {% endcomment %}
+                        <div class="form-outline mb-2">
+                            <input type="text" id="username" name="name" value="{{ user.first_name }} {{ user.last_name }}" class="form-control" readonly />
+                            <label class="form-label" for="username">Name</label>
+                        </div>
+
+                        <div class="form-outline mb-2">
+                            <input type="email" id="pass" value="{{ user.email }}" name="email" class="form-control" readonly />
+                            <label class="form-label" for="pass">Email</label>
+                        </div>
+
+                        <div class="form-outline mb-2">
+                            <input type="text" id="pass" name="course" value="{{ course.courseName }}"
+                                class="form-control" readonly />
+                            <label class="form-label" for="pass">Course</label>
+                        </div>
+
+                        <div class="form-outline mb-2">
+                            <input type="text" id="pass" name="amount" value="{% if discount %} {{discount}} {% else %} {{ course.coursePrice }} {% endif %}"
+                                class="form-control" readonly />
+                            <label class="form-label" for="pass">₹ Amount</label>
+                        </div>
+                        {% if messages %}
+                        {{ message.tags }}
+                        {% for message in messages %}
+                        <h5 style="color:red">{{ message }}</h5>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                <div id="payments" class="container text-center">
+                    {% if payment %}
+                    <form action="/paymentSuccess/" method="POST">
+                        <script src="https://checkout.razorpay.com/v1/checkout.js" data-key="rzp_test_MbEdcN38jYl5CD"
+                            data-amount="{{payment.amount}}" data-currency="INR" data-order_id="{{payment.id}}"
+                            data-buttontext="Pay with Razorpay $" data-name="CoursePayment Corp"
+                            data-description="Test transaction" data-image="https://example.com/your_logo.jpg"
+                            data-prefill.name="Mohit Pandey" data-prefill.email="mohit.pandey@example.com"
+                            data-prefill.contact="9999999999" data-theme.color="#F37254">
+                            </script>
+                        <input type="hidden" custom="Hidden Element" name="hidden">
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

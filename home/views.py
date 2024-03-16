@@ -2,21 +2,42 @@ from django.shortcuts import render,redirect,HttpResponse
 from django.contrib.auth.models import User  # use this for Creating User
 from django.contrib.auth import authenticate, login, logout  # use this for login and logout the user 
 from django.contrib import messages   #use this for Get message when signin,login go to singnup function..
-from .models import UserProfile,Course,Category
+from .models import UserProfile,Course,Category,OrdersPayment
 from django.db.models import Count
 import random
+import razorpay
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 
 
 
 # Create your views here.
 def Home (request):
+    if request.method == "GET":
+      search = request.GET.get('search')
+      if search != None:
+        course = Course.objects.filter(courseName__icontains=search)
+        return render(request,"Products/allCourse.html",{'courses':course})
     return render(request, 'Home/home.html')
 
 def ProfilePage(request):
+    if request.method == "GET":
+      search = request.GET.get('search')
+      if search != None:
+        course = Course.objects.filter(courseName__icontains=search)
+        return render(request,"Products/allCourse.html",{'courses':course})
     userinfo = get_object_or_404(UserProfile, user=request.user)
-    return render(request,'UserProfile/userprofile.html',{'userinfo':userinfo})
+    # Get the orders made by the user
+    orders = OrdersPayment.objects.filter(user=request.user) 
+    # Extract the course IDs from the orders
+    course = [order.buycourse for order in orders]
+    
+    # Get the courses bought by the user
+    courses = Course.objects.filter(courseName__in=course)
+    return render(request, 'UserProfile/userprofile.html', {'userinfo': userinfo, 'courses': courses})
+
 
 def updateProfile(request):
     userinfo = get_object_or_404(UserProfile, user=request.user)
@@ -50,6 +71,11 @@ def updateProfile(request):
     return render(request, 'UserProfile/updateProfile.html', {'userinfo': userinfo})
 
 def Products(request):
+    if request.method == "GET":
+      search = request.GET.get('search')
+      if search != None:
+        course = Course.objects.filter(courseName__icontains=search)
+        return render(request,"Products/allCourse.html",{'courses':course})
     courses = Course.objects.order_by('-studentOnCourse')[:6]
     category_counts = Category.objects.annotate(course_count=Count('course'))  
     context = {'courses':courses, 'categories':category_counts}
@@ -66,10 +92,14 @@ def AllCourses(request):
     return render(request,"Products/allCourse.html",context)
 
 def ProductView(request,id):
+    if request.method == "GET":
+      search = request.GET.get('search')
+      if search != None:
+        course = Course.objects.filter(courseName__icontains=search)
+        return render(request,"Products/allCourse.html",{'courses':course})
     view =Course.objects.get(id=id)
     return render(request,'Products/productView.html',{'view':view})
 
-@login_required
 def CategoryCourses(request,id):
     try:
         category = Category.objects.get(id=id)
@@ -82,7 +112,62 @@ def CategoryCourses(request,id):
 
 
 def About(request):
+    if request.method == "GET":
+      search = request.GET.get('search')
+      if search != None:
+        course = Course.objects.filter(courseName__icontains=search)
+        return render(request,"Products/allCourse.html",{'courses':course})
     return render(request,'About/about.html')
+
+@login_required
+def PaymentPage(request, id):
+    course = Course.objects.get(id = id)
+    if request.method == "POST":
+        user = request.user
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        courseName = request.POST.get('course')
+        referral_code = request.POST.get('referral')
+        amount = request.POST.get('amount')
+        amount_in_paisa = int(float(amount) * 100)
+        discount = 0
+        if referral_code!='':
+            try:
+                referred_user_profile = UserProfile.objects.get(referral_link=referral_code)
+                discount = 0.2  # 20% discount
+                messages.success(request,"The code is applied")
+                referred_user_profile.referral_code_used += 1
+                referred_user_profile.save()
+            except UserProfile.DoesNotExist:
+                messages.error(request,"The code is not applied check the code")
+        discounted_amount = amount_in_paisa * (1 - discount)
+        display_amount = int(discounted_amount/100)
+        client = razorpay.Client(auth=('rzp_test_MbEdcN38jYl5CD','LBTeBzDD6GDr3OJujxqHHELX'))
+        payment = client.order.create({
+        'amount': discounted_amount,
+        'currency': 'INR',
+        'payment_capture': '1'
+        })
+        Orderspayment = OrdersPayment(user=user,name=name, email=email, buycourse=courseName, amount=amount, payment_id=payment['id'])
+        Orderspayment.save()
+
+        return render(request,'Payment/checkPayment.html',{'payment':payment,'course':course,'discount':display_amount})
+    return render(request,'Payment/paymentPage.html',{'course':course})
+
+@csrf_exempt
+def PaymentSuccess(request):
+    if request.method == "POST":
+        order_id = request.POST.get("razorpay_order_id")
+        if order_id:
+            user = OrdersPayment.objects.filter(payment_id=order_id).first()
+            if user:
+                user.paid = True
+                user.save()
+        else:
+            return HttpResponseBadRequest("No razorpay_order_id found in the POST data")
+
+    return render(request, 'Payment/success.html')
+
 
 def UserSignup(request):
     if request.method == "POST":

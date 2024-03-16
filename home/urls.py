@@ -13,5 +13,7 @@ urlpatterns = [
     path('allCourses/',views.AllCourses, name='allCourses'),
     path('productView/<slug:id>',views.ProductView, name='productView'),
     path('courses/<slug:id>',views.CategoryCourses, name='courses'),
+    path('paymentPage/<slug:id>',views.PaymentPage, name='paymentPage'),
+    path('paymentSuccess/',views.PaymentSuccess, name='paymentSuccess'),
     path('about/',views.About, name='about'),
 ]
