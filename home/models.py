@@ -30,7 +30,7 @@ class Course(models.Model):
     coursePrice = models.IntegerField(null=True,blank=True)
     madeBy = models.CharField(max_length = 150,null=True,blank=True)
     courseDuration = models.CharField(max_length = 50)
-    studentOnCourse = models.IntegerField(default = 0)
+    studentOnCourse = models.IntegerField(default = 0,editable=False)
     AboutCourse = HTMLField(blank=True)
 
     def __str__(self) -> str:
@@ -47,3 +47,35 @@ class OrdersPayment(models.Model):
     payment_id = models.CharField(max_length = 150)
     paid = models.BooleanField(default = False)
 
+
+class Event(models.Model):
+    title = models.CharField(max_length=200)
+    description = HTMLField(blank =True)
+    date = models.DateField()
+    time = models.TimeField()
+    image = models.ImageField(upload_to='event_images', null=True, blank=True)
+    organizer = models.CharField(default='',null=True,blank=True,max_length=100)
+    participants = models.IntegerField(default=0,editable=False)
+
+    def __str__(self):
+        return self.title
+
+class EventRegistration(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username} registered for {self.event.title}"
+
+class Sales(models.Model):
+    one_day_sale = models.DecimalField(max_digits=10, decimal_places=2, default=0,editable=False)
+    one_week_sale = models.DecimalField(max_digits=10, decimal_places=2, default=0,editable=False)
+    one_month_sale = models.DecimalField(max_digits=10, decimal_places=2, default=0,editable=False)
+    one_year_sale = models.DecimalField(max_digits=10, decimal_places=2, default=0,editable=False)
+    lifetime_sale = models.DecimalField(max_digits=10, decimal_places=2, default=0,editable=False)
+
+    def __str__(self):
+        return "Sales"
+
+    class Meta:
+        verbose_name_plural = "Sales"

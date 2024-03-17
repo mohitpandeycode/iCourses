@@ -2,14 +2,16 @@ from django.shortcuts import render,redirect,HttpResponse
 from django.contrib.auth.models import User  # use this for Creating User
 from django.contrib.auth import authenticate, login, logout  # use this for login and logout the user 
 from django.contrib import messages   #use this for Get message when signin,login go to singnup function..
-from .models import UserProfile,Course,Category,OrdersPayment
+from .models import UserProfile,Course,Category,OrdersPayment,Event,EventRegistration,Sales
 from django.db.models import Count
 import random
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest,HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
+from datetime import datetime, timedelta
+from django.db.models import Sum
 
 
 # Create your views here.
@@ -35,10 +37,12 @@ def ProfilePage(request):
     orders = OrdersPayment.objects.filter(user=request.user) 
     # Extract the course IDs from the orders
     course = [order.buycourse for order in orders]
-    
     # Get the courses bought by the user
     courses = Course.objects.filter(courseName__in=course)
-    return render(request, 'UserProfile/userprofile.html', {'userinfo': userinfo, 'courses': courses})
+
+    eventRegistration = EventRegistration.objects.filter(user=request.user)
+    context = {'userinfo': userinfo, 'courses': courses,'events':eventRegistration}
+    return render(request, 'UserProfile/userprofile.html',context)
 
 # Update ProfilePage view**************************************************
 def updateProfile(request):
@@ -118,7 +122,40 @@ def CategoryCourses(request,id):
 
 # Events Page view**********************************************************
 def EventPage(request):
-   return render(request,'EventsPage/eventPage.html')
+    events = Event.objects.all().order_by('-id')
+    registrations = EventRegistration.objects.filter(user=request.user)
+    
+    # Create a dictionary to store registered event titles
+    registered_events = {}
+    for registration in registrations:
+        registered_events[registration.event.title] = True
+    
+    return render(request, 'EventsPage/eventPage.html', {'events': events, 'registered_events': registered_events})
+
+# Event Info Page view******************************************************
+def EventInfo(request, id):
+    event = Event.objects.get(id=id)
+    registrations = EventRegistration.objects.filter(user=request.user)
+    
+    # Create a dictionary to store registered event titles
+    registered_events = {}
+    for registration in registrations:
+        registered_events[registration.event.title] = True
+    
+    return render(request, 'EventsPage/aboutEvent.html', {'event': event, 'registered_events': registered_events})
+
+# Event registration Form***************************************************
+@login_required
+def EventRegistrations(request,id):
+   events = Event.objects.get(id=id)
+   if request.method=="POST":
+        registration = EventRegistration(user = request.user,event=events)
+        registration.save()
+        events.participants += 1
+        events.save()
+        messages.success(request,"your application has been submitted!")
+   return render(request,'EventsPage/registrationform.html',{'event':events})
+
 
 # About Page view***********************************************************
 def About(request):
@@ -171,19 +208,56 @@ def PaymentPage(request, id):
     return render(request,'Payment/paymentPage.html',{'course':course})
 
 # Payment Success Page view*************************************************
+
+
 @csrf_exempt
 def PaymentSuccess(request):
     if request.method == "POST":
         order_id = request.POST.get("razorpay_order_id")
         if order_id:
-            user = OrdersPayment.objects.filter(payment_id=order_id).first()
-            if user:
-                user.paid = True
-                user.save()
+            order_payment = OrdersPayment.objects.filter(payment_id=order_id).first()
+            if order_payment:
+                if not order_payment.paid:
+                    order_payment.paid = True
+                    order_payment.save()
+
+                    # Update sales report
+                    current_date = datetime.now().date()
+                    one_week_ago = current_date - timedelta(days=7)
+                    one_month_ago = current_date - timedelta(days=30)
+                    one_year_ago = current_date - timedelta(days=365)
+
+                    # Fetch or create Sales object
+                    sales_report, created = Sales.objects.get_or_create(pk=1)  
+
+                    # One day sales
+                    one_day_sales = OrdersPayment.objects.filter(user=order_payment.user, paid=True, id=order_payment.id).aggregate(total=Sum('amount'))['total'] or 0
+                    # One week sales
+                    one_week_sales = OrdersPayment.objects.filter(user=order_payment.user, paid=True, id=order_payment.id).aggregate(total=Sum('amount'))['total'] or 0
+                    # One month sales
+                    one_month_sales = OrdersPayment.objects.filter(user=order_payment.user, paid=True, id=order_payment.id).aggregate(total=Sum('amount'))['total'] or 0
+                    # One year sales
+                    one_year_sales = OrdersPayment.objects.filter(user=order_payment.user, paid=True, id=order_payment.id).aggregate(total=Sum('amount'))['total'] or 0
+                    # Lifetime sales related to the current course purchased by the user
+                    lifetime_sales = int(order_payment.amount)  # Assuming amount field stores the payment amount
+
+                    # Update Sales model
+                    sales_report.one_day_sale += one_day_sales
+                    sales_report.one_week_sale += one_week_sales
+                    sales_report.one_month_sale += one_month_sales
+                    sales_report.one_year_sale += one_year_sales
+                    sales_report.lifetime_sale += lifetime_sales
+                    sales_report.save()
+
+                    return render(request, 'Payment/success.html')
+                else:
+                    return HttpResponseBadRequest("Order already paid")
+            else:
+                return HttpResponseBadRequest("Invalid order ID")
         else:
             return HttpResponseBadRequest("No razorpay_order_id found in the POST data")
 
-    return render(request, 'Payment/success.html')
+    return HttpResponseNotAllowed(["POST"])
 
 # User Signup view**********************************************************
 def UserSignup(request):

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}
+  Event Registration details - iCourses
+{% endblock %}
+{% block Css %}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block body %}
+  <!-- Section: Design Block -->
+  <section class="">
+    <!-- Jumbotron -->
+    <div class="px-4 py-5 px-md-5 text-center text-lg-start" style="background-color: hsl(0, 0%, 96%)">
+      <div class="container">
+        <div class="row gx-lg-5 align-items-center">
+          <div class="col-lg-6 mb-5 mb-lg-0">
+            <h1 class="my-5 display-3 fw-bold ls-tight">
+              Registration  Form<br />
+              <span class="text-primary">Check The details!</span>
+            </h1>
+          </div>
+
+          <div class=" col-lg-6 mb-5 mb-lg-0">
+            <div class="card">
+              <div class="info card-body py-5 px-md-5">
+                <form method="post">
+                  {% csrf_token %}
+                  <div class="row">
+                    {% comment %} {% if use.is_authenticated %}{% endif %} {% endcomment %}
+                    <div class="form-outline mb-2">
+                      <input type="text" id="username" name="username" value="{{ user.username }}" class="form-control" readonly />
+                      <label class="form-label" for="username"><b>Username</b></label>
+                    </div>
+
+                    <div class="form-outline mb-2">
+                      <input type="text" id="pass" value="{{ user.first_name }} {{ user.last_name }}" name="name" class="form-control" readonly />
+                      <label class="form-label" for="pass"><b>Name</b></label>
+                    </div>
+
+                    <div class="form-outline mb-2">
+                      <input type="email" id="pass" name="email" value="{{ user.email}}" class="form-control" readonly />
+                      <label class="form-label" for="pass"><b>Email</b></label>
+                    </div>
+
+                    <div class="form-outline mb-2">
+                      <input type="text" id="pass" name="event" value="{{event.title}}" class="form-control" readonly />
+                      <label class="form-label" for="pass"><b>Event</b></label>
+                    </div>
+                    <div>
+                      <button type="submit" id="pay" class="btn btn-primary btn-block mb-4">Submit Application <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    {% if messages %}
+                      {{ message.tags }}
+                      {% for message in messages %}
+                        <h5 style="color:red">{{ message }}</h5>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+{% endblock %}
+
+
+
