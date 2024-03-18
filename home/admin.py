@@ -1,5 +1,10 @@
 from django.contrib import admin                      
 
+
+admin.site.site_header = 'Welcome to iCourses'
+admin.site.site_title = 'iCourses-A Courses App'
+admin.site.index_title = 'iCourses Admin Models'
+
 # Register your models here.
 from .models import UserProfile,Course,Category,OrdersPayment,Event,EventRegistration,Sales
 

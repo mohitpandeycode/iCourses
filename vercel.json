@@ -1,0 +1,14 @@
+
+{
+    "builds": [{
+        "src": "Courses_App/wsgi.py",
+        "use": "@vercel/python",
+        "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
+    }],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "Courses_App/wsgi.py"
+        }
+    ]
+}
