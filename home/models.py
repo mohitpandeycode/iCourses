@@ -5,6 +5,7 @@ from tinymce.models import HTMLField
 # Create your models here.
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
+    is_email_varified = models.BooleanField(default=False)
     referral_link = models.CharField(max_length=100,default='', blank=True, null=True)
     picture = models.ImageField(upload_to='profile_pictures', blank=True, null=True)
     phone = models.CharField(max_length=14, default='', blank=True, null=True)
@@ -23,7 +24,7 @@ class Category(models.Model):
         return self.categoryName
 
 class Course(models.Model):
-    coursePicture = models.ImageField(upload_to='coursePicture',null=True,blank = True)
+    coursePicture = models.ImageField(upload_to='coursePicture/',null=True,blank = True)
     courseFile = models.FileField(upload_to='coursePdf',null=True,blank=True)
     courseCategory = models.ForeignKey(Category, on_delete=models.CASCADE ,null=True,blank=True)
     courseName = models.CharField(max_length = 150,null=True,blank=True)
@@ -53,7 +54,7 @@ class Event(models.Model):
     description = HTMLField(blank =True)
     date = models.DateField()
     time = models.TimeField()
-    image = models.ImageField(upload_to='event_images', null=True, blank=True)
+    image = models.ImageField(upload_to='event_images/', null=True, blank=True)
     organizer = models.CharField(default='',null=True,blank=True,max_length=100)
     participants = models.IntegerField(default=0,editable=False)
 

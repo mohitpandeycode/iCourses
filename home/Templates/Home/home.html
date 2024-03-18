@@ -1,28 +1,24 @@
-{% extends "base.html" %}
-{% block title %}Welcome to iCourses{% endblock %}
+{% extends 'base.html' %}
+{% block title %}
+  Welcome to iCourses
+{% endblock %}
 
 {% block Css %}
-<link rel="stylesheet" href="/static/Css/home.css">
+  <link rel="stylesheet" href="/static/Css/home.css" />
 {% endblock %}
 
 {% block body %}
-    
-<section class="container page mt-5 mb-4">
+  <section class="container page mt-5 mb-4">
     <div class="content__container mt-5">
       <h1>
         Best Courses &<br />
         <span class="heading__1">Learning Platform</span><br />
         <span class="heading__2">in The World</span>
       </h1>
-      <p>
-        Unlock your full learning potential with our intuitive Tech & NonTech Courses
-        platform. Seamlessly blending technology and education, we provide an
-        immersive learning environment that combines interactive lessons,
-        amazing Concepts, and intelligent feedback.
-      </p>
-    <form>
-        <input type="text" placeholder="What do you want to learn" />
-        <a href="/login/"><button type="submit">Search</button></a>
+      <p>Unlock your full learning potential with our intuitive Tech & NonTech Courses platform. Seamlessly blending technology and education, we provide an immersive learning environment that combines interactive lessons, amazing Concepts, and intelligent feedback.</p>
+      <form method="get">
+        <input type="text" name="search" placeholder="What do you want to learn" />
+        <button type="submit">Search</button>
       </form>
     </div>
     <div class="image__container">

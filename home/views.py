@@ -6,19 +6,38 @@ from .models import UserProfile,Course,Category,OrdersPayment,Event,EventRegistr
 from django.db.models import Count
 import random
 import razorpay
+from django.urls import reverse
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str, DjangoUnicodeDecodeError
+from .utils import generate_token
+from django.core.mail import EmailMessage
+from django.core.mail import send_mail
+from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest,HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
 from datetime import datetime, timedelta
 from django.db.models import Sum
+import threading
 
 
 # Create your views here.
+# making email thread to send without loading******************************
+class EmailThread(threading.Thread):
+
+    def __init__(self, email):
+        self.email = email
+        threading.Thread.__init__(self)
+
+    def run(self):
+        self.email.send()
 
 # Home page view***********************************************************
 def Home (request):
-    if request.method == "GET":
+    if request.method == "GET": #search functionality.....
       search = request.GET.get('search')
       if search != None:
         course = Course.objects.filter(courseName__icontains=search)
@@ -81,10 +100,10 @@ def Products(request):
     if request.method == "GET":
       search = request.GET.get('search')
       if search != None:
-        course = Course.objects.filter(courseName__icontains=search)
+        course = Course.objects.filter(courseName__icontains=search) 
         return render(request,"Products/allCourse.html",{'courses':course})
-    courses = Course.objects.order_by('-studentOnCourse')[:6]
-    category_counts = Category.objects.annotate(course_count=Count('course'))  
+    courses = Course.objects.order_by('-studentOnCourse')[:6] # Get the top 6 course by user purchased count..
+    category_counts = Category.objects.annotate(course_count=Count('course')) # get the catagory courses in the page....
     context = {'courses':courses, 'categories':category_counts}
     return render(request, 'Products/productPage.html',context)
 
@@ -95,25 +114,25 @@ def AllCourses(request):
       if search != None:
         course = Course.objects.filter(courseName__icontains=search)
         return render(request,"Products/allCourse.html",{'courses':course})
-    courses = Course.objects.order_by('-studentOnCourse')
+    courses = Course.objects.order_by('-studentOnCourse') # get the all courses bu student count in all course page............. 
     context = {'courses':courses}
     return render(request,"Products/allCourse.html",context)
 
-# View for specefic products About******************************************
+# View for specefic products About page******************************************
 def ProductView(request,id):
     if request.method == "GET":
       search = request.GET.get('search')
       if search != None:
         course = Course.objects.filter(courseName__icontains=search)
         return render(request,"Products/allCourse.html",{'courses':course})
-    view =Course.objects.get(id=id)
+    view =Course.objects.get(id=id) # Get the course about page......
     return render(request,'Products/productView.html',{'view':view})
 
 # view for All products of diffrent categories******************************
 def CategoryCourses(request,id):
     try:
         category = Category.objects.get(id=id)
-        courses = Course.objects.filter(courseCategory=category)
+        courses = Course.objects.filter(courseCategory=category) # get all the courses by same categories name............
         context = {'courses': courses, 'category': category}
         return render(request, 'Products/categoryView.html', context)
     except Category.DoesNotExist:
@@ -122,27 +141,31 @@ def CategoryCourses(request,id):
 
 # Events Page view**********************************************************
 def EventPage(request):
-    events = Event.objects.all().order_by('-id')
-    registrations = EventRegistration.objects.filter(user=request.user)
+    events = Event.objects.all().order_by('-id') #get the events list form database....
+    if request.user.is_authenticated:
+        registrations = EventRegistration.objects.filter(user=request.user) #check if user authenticated then show the register on event button....
     
     # Create a dictionary to store registered event titles
-    registered_events = {}
-    for registration in registrations:
-        registered_events[registration.event.title] = True
-    
-    return render(request, 'EventsPage/eventPage.html', {'events': events, 'registered_events': registered_events})
+        registered_events = {}
+        for registration in registrations:
+            registered_events[registration.event.title] = True  #check if the user participate in the event then dont show apply button again...
+        return render(request, 'EventsPage/eventPage.html', {'events': events, 'registered_events': registered_events})
+    else:
+         return render(request, 'EventsPage/eventPage.html', {'events': events})
 
-# Event Info Page view******************************************************
+# About Info Page view******************************************************
 def EventInfo(request, id):
     event = Event.objects.get(id=id)
-    registrations = EventRegistration.objects.filter(user=request.user)
+    if request.user.is_authenticated:
+        registrations = EventRegistration.objects.filter(user=request.user) # Same concept as EventPage...........
     
     # Create a dictionary to store registered event titles
-    registered_events = {}
-    for registration in registrations:
-        registered_events[registration.event.title] = True
-    
-    return render(request, 'EventsPage/aboutEvent.html', {'event': event, 'registered_events': registered_events})
+        registered_events = {}
+        for registration in registrations:
+            registered_events[registration.event.title] = True
+        return render(request, 'EventsPage/aboutEvent.html', {'event': event, 'registered_events': registered_events})
+    else:
+        return render(request, 'EventsPage/aboutEvent.html', {'event': event})
 
 # Event registration Form***************************************************
 @login_required
@@ -152,10 +175,9 @@ def EventRegistrations(request,id):
         registration = EventRegistration(user = request.user,event=events)
         registration.save()
         events.participants += 1
-        events.save()
+        events.save()  # Save the user info in event Registration when user apply
         messages.success(request,"your application has been submitted!")
    return render(request,'EventsPage/registrationform.html',{'event':events})
-
 
 # About Page view***********************************************************
 def About(request):
@@ -179,18 +201,18 @@ def PaymentPage(request, id):
         amount = request.POST.get('amount')
         amount_in_paisa = int(float(amount) * 100)
         discount = 0
-        if referral_code!='':
+        if referral_code!='': # Check if user uses reffral code.....
             try:
-                referred_user_profile = UserProfile.objects.get(referral_link=referral_code)
+                referred_user_profile = UserProfile.objects.get(referral_link=referral_code)   # Check Referral code is matched for any referral code of users...
                 discount = 0.2  # 20% discount
-                messages.success(request,"The code is applied")
-                referred_user_profile.referral_code_used += 1
-                referred_user_profile.save()
+                messages.success(request,"Code is applied, You got 20% discount!!!")
+                referred_user_profile.referral_code_used += 1  # then add used reffral code field of user by one...........
+                referred_user_profile.save()  
             except UserProfile.DoesNotExist:
-                messages.error(request,"The code is not applied check the code")
+                messages.error(request,"The code is not applied check the code again...")
         discounted_amount = amount_in_paisa * (1 - discount)
         display_amount = int(discounted_amount/100)
-        client = razorpay.Client(auth=('rzp_test_MbEdcN38jYl5CD','LBTeBzDD6GDr3OJujxqHHELX'))
+        client = razorpay.Client(auth=('rzp_test_MbEdcN38jYl5CD','LBTeBzDD6GDr3OJujxqHHELX')) #add razor payment gateway.....
         payment = client.order.create({
         'amount': discounted_amount,
         'currency': 'INR',
@@ -198,7 +220,7 @@ def PaymentPage(request, id):
         })
         Orderspayment = OrdersPayment(user=user,name=name, email=email, buycourse=courseName, amount=amount, payment_id=payment['id'])
         Orderspayment.save()
-        course = Course.objects.get(courseName=courseName)
+        course = Course.objects.get(courseName=courseName)  # Save the orders detail and user info in the database.
                 
                 # Increment the studentOnCourse field by 1
         course.studentOnCourse += 1
@@ -208,8 +230,6 @@ def PaymentPage(request, id):
     return render(request,'Payment/paymentPage.html',{'course':course})
 
 # Payment Success Page view*************************************************
-
-
 @csrf_exempt
 def PaymentSuccess(request):
     if request.method == "POST":
@@ -219,8 +239,8 @@ def PaymentSuccess(request):
             if order_payment:
                 if not order_payment.paid:
                     order_payment.paid = True
-                    order_payment.save()
-
+                    order_payment.save() #check if the user paid for the course and then save the paid field true.......
+                    
                     # Update sales report
                     current_date = datetime.now().date()
                     one_week_ago = current_date - timedelta(days=7)
@@ -259,6 +279,24 @@ def PaymentSuccess(request):
 
     return HttpResponseNotAllowed(["POST"])
 
+# Send email activation mail for signup varification************************************************
+def send_activation_email(user,request):
+    current_site = get_current_site(request) 
+    email_subject = 'Activate Your Account'
+    email_body = render_to_string('login-signup/activate.html',{
+        'user':user,
+        'domain':current_site,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': generate_token.make_token(user)
+    })
+
+    email = EmailMessage(subject=email_subject,
+                 body=email_body,
+                 from_email=settings.EMAIL_FROM_USER,
+                 to=[user.email]
+                 )
+    EmailThread(email).start() #pass the email send mathod to the thread to excution behind the page......
+
 # User Signup view**********************************************************
 def UserSignup(request):
     if request.method == "POST":
@@ -273,7 +311,9 @@ def UserSignup(request):
         if len(username) < 3:
             messages.error(request, "Invalid Username")
             return redirect("/signup/")
-
+        if (len(password)<6):
+            messages.error(request, "Password is too small use min. 6 number of password! ")
+            return redirect("/signup/")
         # Check password and confirm password match
         if password != cpassword:
             messages.error(request, "Password and Confirm Password do not match! ")
@@ -283,6 +323,7 @@ def UserSignup(request):
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username Already taken!")
             return redirect("/signup/")
+        
         if User.objects.filter(email=email).exists():
             messages.error(request, "Email Already exists, try to login!")
             return redirect("/signup/")
@@ -292,6 +333,7 @@ def UserSignup(request):
         user.first_name = first_name
         user.last_name = last_name
         user.save()
+        send_activation_email(user,request)
 
         # Generate random referral code for every user
         random_numbers = ''.join(random.choices('0123456789', k=3))
@@ -302,7 +344,7 @@ def UserSignup(request):
         user_profile.referral_link = referral_code
         user_profile.save()
 
-        messages.success(request, "Account Created Successfully!")
+        messages.success(request, "We sent you an email verify yor account!")
         return redirect("/login/")
 
     return render(request, "login-signup/signup.html")
@@ -319,7 +361,10 @@ def UserLogin(request):
 
         # Authenticate the user
         user = authenticate(request, username=username, password=password)
-
+        user_profile = UserProfile.objects.get(user=user)
+        if not user_profile.is_email_varified:
+            messages.error(request,"Your Email not varified, please check the email we sent!")
+            return render(request, "login-signup/login.html")
         # Login the user
         if user is None:
             messages.error(request, 'Invalid Password!')
@@ -336,3 +381,19 @@ def UserLogout(request):
         logout(request)
         return redirect("/")
     return HttpResponse('<h1>Error 404 - Page not found!</h1>')
+
+# check if user varify by gmail or not ***************************************************
+def activate_user(request,uidb64,token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except Exception as e:
+        user = None
+    
+    if user and generate_token.check_token(user,token):
+        user_profile = UserProfile.objects.get(user=user)
+        user_profile.is_email_varified = True
+        user_profile.save()
+        messages.success(request,"Your email is varified...")
+        return redirect('/login/')
+    return render(request,'login-signup/activate_failed.html',{'user':user})

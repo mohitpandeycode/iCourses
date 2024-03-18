@@ -28,6 +28,9 @@
       <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
         <h6 class="section-title bg-white text-center text-primary px-3">Events</h6>
         <h1 class="mb-5">Our Events - iCourse</h1>
+        {% if not user.is_authenticated %}
+        <h4 class="text-danger">Make sure to login for apply in any events!</h4>
+        {% endif %}
       </div><hr/>
       <div class="row g-4 justify-content-start">
         {% for event in events %}
@@ -39,8 +42,12 @@
                 {% if event.title in registered_events %}
                 <a href="/eventInfo/{{ event.id }}" class="flex-shrink-0 btn btn-sm btn-warning px-3 border-end" style="border-radius: 30px;">About Event</a>
               {% else %}
-                <a href="/eventInfo/{{ event.id }}" class="flex-shrink-0 btn btn-sm btn-primary px-3 border-end" style="border-radius: 30px 0 0 30px;">About Event</a>
-                <a href="/eventRegistration/{{ event.id }}" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 0 30px 30px 0;">Register Now</a>
+                <a href="/eventInfo/{{ event.id }}" class="flex-shrink-0 btn btn-sm btn-warning px-3 border-end" style="border-radius: 30px 0 0 30px;">About Event</a>
+                {% if user.is_authenticated %}
+                <a href="/eventRegistration/{{ event.id }}" class="flex-shrink-0 btn btn-sm btn-warning px-3" style="border-radius: 0 30px 30px 0;">Register Now</a>
+                {% else %}
+                <a href="/login/" class="flex-shrink-0 btn btn-sm btn-warning px-3" style="border-radius: 0 30px 30px 0;">Login To Apply</a>
+                {% endif %}
               {% endif %}
               </div>
             </div>

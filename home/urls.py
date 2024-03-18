@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path('',views.Home, name='home'),
     path('login/',views.UserLogin, name='login'),
+    path('activate_user/<uidb64>/<token>',views.activate_user, name='activate'),
     path('signup/',views.UserSignup, name='signup'),
     path('logout/',views.UserLogout, name='logout'),
     path('profilePage/',views.ProfilePage, name='profilePage'),

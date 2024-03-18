@@ -63,7 +63,11 @@
             {% if event.title in registered_events %}
             <a href="" class="btn btn-secondary shadow-0">Already Aplied</a>
             {% else %}
+            {% if user.is_authenticated %}
             <a href="/eventRegistration/{{event.id}}" class="btn btn-warning shadow-0">Apply for Event</a>
+            {% else %}
+            <a href="/login/" class="btn btn-warning shadow-0">Login to apply</a>
+            {% endif %}
             {% endif %}
             <a href="#" class="btn btn-light border border-secondary py-2 icon-hover px-3"><i class="me-1 fa fa-heart fa-lg"></i>Save</a>
           </div>

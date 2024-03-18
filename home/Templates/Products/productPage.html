@@ -126,7 +126,11 @@
             {% endif %}
                 <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
                   <a href="/productView/{{course.id}}" class="flex-shrink-0 btn btn-sm btn-primary px-3 border-end" style="border-radius: 30px 0 0 30px;">Read More</a>
+                  {% if user.is_authenticated %}
                   <a href="/paymentPage/{{course.id}}" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 0 30px 30px 0;">Buy Now</a>
+                  {% else %}
+                  <a href="/login/" class="flex-shrink-0 btn btn-sm btn-primary px-3" style="border-radius: 0 30px 30px 0;">Login To Buy</a>
+                  {% endif %}
                 </div>
               </div>
               <div class="text-center p-4 pb-0">
