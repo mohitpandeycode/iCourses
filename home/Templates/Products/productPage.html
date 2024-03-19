@@ -78,35 +78,6 @@
 
   <!-- Service End -->
 
-  <!-- Categories Start -->
-
-  <div class="container-xxl py-5 category">
-    <div class="container">
-      <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-        <h6 class="section-title bg-white text-center text-primary px-3">Categories</h6>
-        <h1 class="mb-5">Courses Categories</h1>
-      </div>
-      <div class="container">
-        <div class="row">
-          {% for category in categories %}
-            <div class="col-lg-4 col-md-6 mb-4">
-              <div class="card">
-                <img src="/static/images/cat-1.jpg" class="card-img-top" alt="..." />
-                <div class="card-body bg-light">
-                  <h5 class="card-title">{{ category.categoryName }}</h5>
-                  <b><span class="mx-2 card-text">{{ category.course_count }} Courses</span></b>
-                    <a href="/courses/{{category.id}}" class="btn btn-primary">Explore</a>
-                </div>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-  </div>
-<hr>
-  <!-- Categories end -->
-
   <!-- Courses Start -->
   <div class="container-xxl py-5">
     <div class="container">
@@ -150,6 +121,36 @@
   </div>
   <hr>
   <!-- Courses End -->
+
+
+  <!-- Categories Start -->
+
+  <div class="container-xxl py-5 category">
+    <div class="container">
+      <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+        <h6 class="section-title bg-white text-center text-primary px-3">Categories</h6>
+        <h1 class="mb-5">Courses Categories</h1>
+      </div>
+      <div class="container">
+        <div class="row">
+          {% for category in categories %}
+            <div class="col-lg-4 col-md-6 mb-4">
+              <div class="card">
+                <img src="/static/images/cat-1.jpg" class="card-img-top" alt="..." />
+                <div class="card-body bg-light">
+                  <h5 class="card-title">{{ category.categoryName }}</h5>
+                  <b><span class="mx-2 card-text">{{ category.course_count }} Courses</span></b>
+                    <a href="/courses/{{category.id}}" class="btn btn-primary">Explore</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+<hr>
+  <!-- Categories end -->
 
   <!-- Team Start -->
   <div class="container-xxl py-5">
