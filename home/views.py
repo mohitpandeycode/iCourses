@@ -364,7 +364,7 @@ def UserLogin(request):
         user = authenticate(request, username=username, password=password)
         user_profile = UserProfile.objects.get(user=user)
         if not user_profile.is_email_varified:
-            messages.error(request,"Your Email not varified, please check the email we sent!")
+            messages.error(request,"Your Email not verified, please check the email we sent!")
             return render(request, "login-signup/login.html")
         # Login the user
         if user is None:
