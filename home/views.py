@@ -227,7 +227,7 @@ def PaymentPage(request, id):
         course.save()
 
         return render(request,'Payment/checkPayment.html',{'payment':payment,'course':course,'discount':display_amount})
-    return render(request,'Payment/paymentPage.html',{'course':course})
+    return render(request,'Payment/paymentpage.html',{'course':course})
 
 # Payment Success Page view*************************************************
 @csrf_exempt
