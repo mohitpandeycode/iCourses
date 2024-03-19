@@ -7,7 +7,7 @@ colorama==0.4.6
 crypto==1.4.1
 distlib==0.3.8
 dj-static==0.0.6
-Django==5.0.3
+Django
 django-tinymce==3.7.1
 Faker==22.6.0
 filelock==3.13.1
