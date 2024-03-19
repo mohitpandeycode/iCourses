@@ -126,7 +126,7 @@ def ProductView(request,id):
         course = Course.objects.filter(courseName__icontains=search)
         return render(request,"Products/allCourse.html",{'courses':course})
     view =Course.objects.get(id=id) # Get the course about page......
-    return render(request,'Products/productView.html',{'view':view})
+    return render(request,'Products/productview.html',{'view':view})
 
 # view for All products of diffrent categories******************************
 def CategoryCourses(request,id):
@@ -177,7 +177,7 @@ def EventRegistrations(request,id):
         events.participants += 1
         events.save()  # Save the user info in event Registration when user apply
         messages.success(request,"your application has been submitted!")
-   return render(request,'EventsPage/registrationform.html',{'event':events})
+   return render(request,'EventsPage/registrationForm.html',{'event':events})
 
 # About Page view***********************************************************
 def About(request):
