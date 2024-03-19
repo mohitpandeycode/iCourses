@@ -298,6 +298,7 @@ def send_activation_email(user,request):
     EmailThread(email).start() #pass the email send mathod to the thread to excution behind the page......
 
 # User Signup view**********************************************************
+@csrf_exempt
 def UserSignup(request):
     if request.method == "POST":
         first_name = request.POST.get('fname')
