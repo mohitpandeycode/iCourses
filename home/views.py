@@ -362,10 +362,11 @@ def UserLogin(request):
 
         # Authenticate the user
         user = authenticate(request, username=username, password=password)
-        user_profile = UserProfile.objects.get(user=user)
-        if not user_profile.is_email_varified:
-            messages.error(request,"Your Email not verified, please check the email we sent!")
-            return render(request, "login-signup/login.html")
+        if user is not None:
+            user_profile = UserProfile.objects.get(user=user)
+            if not user_profile.is_email_varified:
+                messages.error(request,"Your Email not verified, please check the email we sent!")
+                return render(request, "login-signup/login.html")
         # Login the user
         if user is None:
             messages.error(request, 'Invalid Password!')
